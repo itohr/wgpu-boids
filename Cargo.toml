@@ -1,13 +1,25 @@
 [package]
+edition = "2021"
 name = "wgpu-boids"
 version = "0.1.0"
-edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-console_log = "1.0.0"
 env_logger = "0.10.0"
 pollster = "0.3.0"
 wasm-bindgen = "0.2.86"
 winit = "0.28.6"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+console_error_panic_hook = "0.1.7"
+console_log = "1.0.0"
+wasm-bindgen-futures = "0.4.37"
+web-sys = {version = "0.3.64", features = [
+  "Document",
+  "Window",
+  "Element",
+]}
+
+[lib]
+crate-type = ["cdylib", "rlib"]
