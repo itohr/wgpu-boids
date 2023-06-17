@@ -10,14 +10,14 @@ struct VertexOutput {
 }
 
 @vertex
-fn vert_main(
+fn vs_main(
     input: VertexInput,
 ) -> VertexOutput {
     let angle = -atan2(input.p_velocity.x, input.p_velocity.y);
     let pos = vec2(
         (input.position.x * cos(angle)) - (input.position.y * sin(angle)),
         (input.position.x * sin(angle)) + (input.position.y * cos(angle)),
-    )
+    );
 
     var output: VertexOutput;
     output.position = vec4(pos + input.p_position, 0.0, 1.0);
@@ -32,6 +32,6 @@ fn vert_main(
 }
 
 @fragment
-fn frag_main(@location(4) color: vec4<f32>) -> @location(0) vec4<f32> {
+fn fs_main(@location(4) color: vec4<f32>) -> @location(0) vec4<f32> {
     return color;
 }

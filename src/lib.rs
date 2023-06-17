@@ -1,3 +1,5 @@
+mod state;
+
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
@@ -36,6 +38,9 @@ pub async fn run() {
             .expect("Could not get canvas element");
     }
 
+    let mut state = state::State::new(&window).await;
+
+    let mut t = 0;
     event_loop.run(move |event, _, control_flow| {
         *control_flow = winit::event_loop::ControlFlow::Poll;
         match event {
@@ -44,8 +49,28 @@ pub async fn run() {
                 window_id,
             } if window_id == window.id() => match event {
                 WindowEvent::CloseRequested => *control_flow = winit::event_loop::ControlFlow::Exit,
+                WindowEvent::Resized(physical_size) => {
+                    state.resize(*physical_size);
+                }
+                WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
+                    state.resize(**new_inner_size);
+                }
                 _ => {}
             },
+            Event::RedrawRequested(window_id) if window_id == window.id() => {
+                match state.render(t) {
+                    Ok(_) => {}
+                    Err(wgpu::SurfaceError::Lost) => state.resize(state.size()),
+                    Err(wgpu::SurfaceError::OutOfMemory) => {
+                        *control_flow = winit::event_loop::ControlFlow::Exit
+                    }
+                    Err(e) => eprintln!("{:?}", e),
+                }
+                t += 1;
+            }
+            Event::MainEventsCleared => {
+                window.request_redraw();
+            }
             _ => {}
         }
     });
