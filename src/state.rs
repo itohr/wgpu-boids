@@ -13,7 +13,7 @@ pub struct State {
 }
 
 impl State {
-    pub async fn new(window: winit::window::Window) -> Self {
+    pub async fn new(window: &winit::window::Window) -> Self {
         let instance = wgpu::Instance::default();
 
         let adapter = instance
@@ -46,7 +46,7 @@ impl State {
             .filter(|f| f.is_srgb())
             .next()
             .unwrap_or(surface_caps.formats[0]);
-        let size = window.inner_size();
+        let size = window.inner_size().clone();
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: surface_format,
@@ -69,12 +69,13 @@ impl State {
                 module: &sprite_shader_module,
                 entry_point: "vs_main",
                 buffers: &[
+                    // for instanced particles
                     wgpu::VertexBufferLayout {
                         array_stride: std::mem::size_of::<[f32; 4]>() as wgpu::BufferAddress,
                         step_mode: wgpu::VertexStepMode::Instance,
                         attributes: &wgpu::vertex_attr_array![0 => Float32x2, 1 => Float32x2],
                     },
-                    // for vertex positoins
+                    // for vertex positions
                     wgpu::VertexBufferLayout {
                         array_stride: std::mem::size_of::<[f32; 2]>() as wgpu::BufferAddress,
                         step_mode: wgpu::VertexStepMode::Vertex,
@@ -108,10 +109,10 @@ impl State {
             multiview: Default::default(),
         });
 
-        let vertex_buffer_date = vec![-0.01, -0.02, 0.01, -0.02, 0.0, 0.02];
+        let vertex_buffer_data: Vec<f32> = vec![-0.01, -0.02, 0.01, -0.02, 0.0, 0.02];
         let sprite_vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: None,
-            contents: bytemuck::cast_slice(&vertex_buffer_date),
+            contents: bytemuck::cast_slice(&vertex_buffer_data),
             usage: wgpu::BufferUsages::VERTEX,
         });
 
@@ -147,6 +148,10 @@ impl State {
             sprite_vertex_buffer,
             particles_buffers: particle_buffers,
         }
+    }
+
+    pub fn size(&self) -> winit::dpi::PhysicalSize<u32> {
+        self.size
     }
 
     pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
