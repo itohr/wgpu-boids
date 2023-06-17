@@ -25,8 +25,10 @@ pub async fn run() {
 
     #[cfg(target_arch = "wasm32")]
     {
-        use winit::platform::web::WindowExtWebSys;
+        use winit::dpi::PhysicalSize;
+        window.set_inner_size(PhysicalSize::new(1000, 1000));
 
+        use winit::platform::web::WindowExtWebSys;
         web_sys::window()
             .and_then(|win| win.document())
             .and_then(|doc| {

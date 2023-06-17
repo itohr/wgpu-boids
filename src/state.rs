@@ -1,5 +1,19 @@
 use wgpu::util::DeviceExt;
 
+macro_rules! log {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    };
+}
+
+fn print_log(msg: &str) {
+    if cfg!(target_arch = "wasm32") {
+        log!("{}", msg);
+    } else {
+        println!("{}", msg);
+    }
+}
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct SimParams {
@@ -45,28 +59,30 @@ impl State {
     pub async fn new(window: &winit::window::Window) -> Self {
         let instance = wgpu::Instance::default();
 
+        let surface = unsafe { instance.create_surface(&window) }.unwrap();
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: wgpu::PowerPreference::HighPerformance,
-                compatible_surface: None,
+                compatible_surface: Some(&surface),
                 force_fallback_adapter: false,
             })
             .await
-            .unwrap();
+            .expect("No suitable GPU adapters found on the system!");
+
+        print_log(&format!("Adapter: {:?}", adapter.get_info()));
 
         let (device, queue) = adapter
             .request_device(
                 &wgpu::DeviceDescriptor {
                     label: None,
                     features: wgpu::Features::empty(),
-                    limits: wgpu::Limits::default(),
+                    limits: wgpu::Limits::default()
                 },
                 None,
             )
             .await
-            .unwrap();
+            .expect("No suitable GPU device found on the system!");
 
-        let surface = unsafe { instance.create_surface(&window) }.unwrap();
         let surface_caps = surface.get_capabilities(&adapter);
         let surface_format = surface_caps
             .formats
