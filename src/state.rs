@@ -51,6 +51,7 @@ pub struct State {
     num_particles: usize,
     sprite_vertex_buffer: wgpu::Buffer,
     particle_buffers: Vec<wgpu::Buffer>,
+    #[allow(dead_code)]
     sim_params_buffer: wgpu::Buffer,
     particle_bind_groups: Vec<wgpu::BindGroup>,
 }
@@ -76,7 +77,7 @@ impl State {
                 &wgpu::DeviceDescriptor {
                     label: None,
                     features: wgpu::Features::empty(),
-                    limits: wgpu::Limits::default()
+                    limits: wgpu::Limits::default(),
                 },
                 None,
             )
