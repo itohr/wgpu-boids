@@ -3,6 +3,7 @@ mod state;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+use winit::dpi::PhysicalSize;
 use winit::event::{Event, WindowEvent};
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
@@ -22,12 +23,10 @@ pub async fn run() {
         .with_title("Boids")
         .build(&event_loop)
         .unwrap();
+    window.set_inner_size(PhysicalSize::new(1200, 1200));
 
     #[cfg(target_arch = "wasm32")]
     {
-        use winit::dpi::PhysicalSize;
-        window.set_inner_size(PhysicalSize::new(1000, 1000));
-
         use winit::platform::web::WindowExtWebSys;
         web_sys::window()
             .and_then(|win| win.document())
