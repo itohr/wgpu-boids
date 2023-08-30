@@ -17,6 +17,7 @@ cargo run
 You can also run the project in the browser with WASM:
 
 ```bash
+cargo install wasm-pack
 wasm-pack build --target web --out-dir client/pkg
 cd client
 yarn install
