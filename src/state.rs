@@ -182,7 +182,7 @@ impl State {
             usage: wgpu::BufferUsages::VERTEX,
         });
 
-        let num_particles = 5120;
+        let num_particles = 10240;
 
         // position and velocity of each boid
         let initial_particle_data = (0..num_particles)

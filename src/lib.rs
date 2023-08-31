@@ -23,7 +23,7 @@ pub async fn run() {
         .with_title("Boids")
         .build(&event_loop)
         .unwrap();
-    window.set_inner_size(PhysicalSize::new(1200, 1200));
+    window.set_inner_size(PhysicalSize::new(1600, 1600));
 
     #[cfg(target_arch = "wasm32")]
     {
